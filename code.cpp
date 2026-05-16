@@ -1,0 +1,166 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Contact {
+public:
+    string name;
+    string phone;
+    string email;
+};
+
+vector<Contact> contacts;
+
+void saveToFile() {
+    ofstream file("contacts.txt");
+
+    for (const auto& contact : contacts) {
+        file << contact.name << endl;
+        file << contact.phone << endl;
+        file << contact.email << endl;
+    }
+
+    file.close();
+}
+
+void loadFromFile() {
+    ifstream file("contacts.txt");
+
+    Contact contact;
+
+    while (getline(file, contact.name)) {
+        getline(file, contact.phone);
+        getline(file, contact.email);
+        contacts.push_back(contact);
+    }
+
+    file.close();
+}
+
+void addContact() {
+    Contact contact;
+
+    cin.ignore();
+
+    cout << "Enter Name: ";
+    getline(cin, contact.name);
+
+    cout << "Enter Phone: ";
+    getline(cin, contact.phone);
+
+    cout << "Enter Email: ";
+    getline(cin, contact.email);
+
+    contacts.push_back(contact);
+
+    saveToFile();
+
+    cout << "Contact Added Successfully\n";
+}
+
+void viewContacts() {
+    if (contacts.empty()) {
+        cout << "No Contacts Found\n";
+        return;
+    }
+
+    for (int i = 0; i < contacts.size(); i++) {
+        cout << "\nContact " << i + 1 << endl;
+        cout << "Name: " << contacts[i].name << endl;
+        cout << "Phone: " << contacts[i].phone << endl;
+        cout << "Email: " << contacts[i].email << endl;
+    }
+}
+
+void searchContact() {
+    cin.ignore();
+
+    string searchName;
+
+    cout << "Enter Name to Search: ";
+    getline(cin, searchName);
+
+    bool found = false;
+
+    for (const auto& contact : contacts) {
+        if (contact.name == searchName) {
+            cout << "\nContact Found\n";
+            cout << "Name: " << contact.name << endl;
+            cout << "Phone: " << contact.phone << endl;
+            cout << "Email: " << contact.email << endl;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "Contact Not Found\n";
+    }
+}
+
+void deleteContact() {
+    cin.ignore();
+
+    string deleteName;
+
+    cout << "Enter Name to Delete: ";
+    getline(cin, deleteName);
+
+    for (int i = 0; i < contacts.size(); i++) {
+        if (contacts[i].name == deleteName) {
+            contacts.erase(contacts.begin() + i);
+            saveToFile();
+            cout << "Contact Deleted Successfully\n";
+            return;
+        }
+    }
+
+    cout << "Contact Not Found\n";
+}
+
+int main() {
+    loadFromFile();
+
+    int choice;
+
+    do {
+        cout << "\n===== Contact Book =====\n";
+        cout << "1. Add Contact\n";
+        cout << "2. View Contacts\n";
+        cout << "3. Search Contact\n";
+        cout << "4. Delete Contact\n";
+        cout << "5. Exit\n";
+        cout << "Enter Choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                addContact();
+                break;
+
+            case 2:
+                viewContacts();
+                break;
+
+            case 3:
+                searchContact();
+                break;
+
+            case 4:
+                deleteContact();
+                break;
+
+            case 5:
+                cout << "Exiting...\n";
+                break;
+
+            default:
+                cout << "Invalid Choice\n";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
